@@ -13,22 +13,6 @@ raw_psm <- read.delim(args[7])
 colnames(raw_psm)[1] <- "Title"
 psm_pga_results <- psm_pga_results %>% filter(peptide %in% pep_pga_results$peptide)
 
-setwd('/Users/chuang8/proteomics/oci-aml/new/deepRescore/work/47/c40fe3be9e2237710a48516adf7127')
-pep_pga_results <- fread("peptide_level/pga-peptideSummary.txt") %>% select(peptide)
-#3983
-psm_pga_results <- fread("psm_level/pga-peptideSummary.txt") %>% select(index, peptide, evalue)
-#5066
-colnames(psm_pga_results)[1] <- "Title"
-all_features <- fread('features.txt') #45732
-auto_rt_train_folder <- "./autoRT_train/"
-auto_rt_prediction_folder <- "./autoRT_prediction/"
-pdeep2_prediction <- "/pDeep2_prediction/FL0012549_pdeep2_prediction"
-raw_psm <- read.delim("FL0012549-rawPSMs.txt")
-#41784     7
-colnames(raw_psm)[1] <- "Title"
-psm_pga_results <- psm_pga_results %>% filter(peptide %in% pep_pga_results$peptide)
-dim(psm_pga_results) #4830     3
-
 auto_rt_train_data <- left_join(psm_pga_results, all_features, by="Title") %>% select(Mod_Sequence, RT, Title, evalue)
 auto_rt_prediction_data <- left_join(raw_psm, all_features, by="Title") %>% select(Mod_Sequence, RT, Title)
 
