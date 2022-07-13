@@ -5,11 +5,12 @@ args <- commandArgs(T)
 folder_path <- args[1]
 sample <- args[2]
 database <- args[3]
+decoyP <- args[4]
 
 calculateFDR(psmfile=paste(folder_path, sample, "-rawPSMs.txt", sep=""),
 	db=database,
 	fdr=0.01,
-	decoyPrefix="XXX_",
+	decoyPrefix=decoyP,
 	better_score_lower=FALSE,
 	remap=FALSE,
         peptide_level=TRUE,
@@ -20,7 +21,7 @@ calculateFDR(psmfile=paste(folder_path, sample, "-rawPSMs.txt", sep=""),
 calculateFDR(psmfile=paste(folder_path, sample, "-rawPSMs.txt", sep=""),
         db=database,
         fdr=0.01,
-        decoyPrefix="XXX_",
+        decoyPrefix=decoyP,
         better_score_lower=FALSE,
         remap=FALSE,
         peptide_level=FALSE,

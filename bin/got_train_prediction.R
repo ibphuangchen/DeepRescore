@@ -13,16 +13,45 @@ raw_psm <- read.delim(args[7])
 colnames(raw_psm)[1] <- "Title"
 psm_pga_results <- psm_pga_results %>% filter(peptide %in% pep_pga_results$peptide)
 
+setwd('/Users/chuang8/proteomics/oci-aml/new/deepRescore/work/47/c40fe3be9e2237710a48516adf7127')
+pep_pga_results <- fread("peptide_level/pga-peptideSummary.txt") %>% select(peptide)
+#3983
+psm_pga_results <- fread("psm_level/pga-peptideSummary.txt") %>% select(index, peptide, evalue)
+#5066
+colnames(psm_pga_results)[1] <- "Title"
+all_features <- fread('features.txt') #45732
+auto_rt_train_folder <- "./autoRT_train/"
+auto_rt_prediction_folder <- "./autoRT_prediction/"
+pdeep2_prediction <- "/pDeep2_prediction/FL0012549_pdeep2_prediction"
+raw_psm <- read.delim("FL0012549-rawPSMs.txt")
+#41784     7
+colnames(raw_psm)[1] <- "Title"
+psm_pga_results <- psm_pga_results %>% filter(peptide %in% pep_pga_results$peptide)
+dim(psm_pga_results) #4830     3
+
 auto_rt_train_data <- left_join(psm_pga_results, all_features, by="Title") %>% select(Mod_Sequence, RT, Title, evalue)
+auto_rt_prediction_data <- left_join(raw_psm, all_features, by="Title") %>% select(Mod_Sequence, RT, Title)
+
+if(!grepl(auto_rt_train_data$Title,pattern = '\\.')) #single fraction?
+{
+  auto_rt_train_data=as.data.table(auto_rt_train_data)
+  auto_rt_train_data=auto_rt_train_data[order(Mod_Sequence,-evalue), .(Mod_Sequence, RT, evalue)]
+  auto_rt_train_data=auto_rt_train_data[!duplicated(Mod_Sequence) & !grepl(Mod_Sequence,pattern = 'U|X')]
+  colnames(auto_rt_train_data) <- c("x", "y", "evalue")
+  write.table(auto_rt_train_data, paste(auto_rt_train_folder, "train.txt", sep=""), row.names=F, quote=F, sep="\t")
+  auto_rt_prediction_data = as.data.table(auto_rt_prediction_data)
+  auto_rt_prediction_data=auto_rt_prediction_data[, .(Mod_Sequence, RT, Title)]
+  auto_rt_prediction_data = auto_rt_prediction_data[!grepl(Mod_Sequence,pattern = 'U|X')]
+  colnames(auto_rt_prediction_data) <- c("x", "y", "index")
+  write.table(auto_rt_prediction_data, paste(auto_rt_prediction_folder, "train.txt", sep=""), row.names=F, quote=F, sep="\t")
+}else{
+  
+  
 auto_rt_train_data <- separate(auto_rt_train_data, Title, into=c("fraction", NA, NA, NA), sep="\\.", remove=F)
 auto_rt_train_data_split <- split(auto_rt_train_data, auto_rt_train_data$fraction)
-auto_rt_prediction_data <- left_join(raw_psm, all_features, by="Title") %>% select(Mod_Sequence, RT, Title)
+
 auto_rt_prediction_data <- separate(auto_rt_prediction_data, Title, into=c("fraction", NA, NA, NA), sep="\\.", remove=F)
 auto_rt_prediction_data_split <- split(auto_rt_prediction_data, auto_rt_prediction_data$fraction)
-
-pdeep2_prediction_data <- raw_psm %>% select(peptide, mods, charge)
-colnames(pdeep2_prediction_data) <- c("peptide", "modification", "charge")
-pdeep2_prediction_unique_data <- pdeep2_prediction_data %>% distinct()
 
 lapply(names(auto_rt_train_data_split), function(x){
 	one_data <- auto_rt_train_data_split[[x]]
@@ -39,6 +68,10 @@ lapply(names(auto_rt_prediction_data_split), function(x){
         colnames(one_data) <- c("x", "y", "index")
 	write.table(one_data, paste(auto_rt_prediction_folder, x, ".txt", sep=""), row.names=F, quote=F, sep="\t")
 })
+}
 
+pdeep2_prediction_data <- raw_psm %>% select(peptide, mods, charge)
+colnames(pdeep2_prediction_data) <- c("peptide", "modification", "charge")
+pdeep2_prediction_unique_data <- pdeep2_prediction_data %>% distinct()
 write.table(pdeep2_prediction_data, paste(pdeep2_prediction, ".txt", sep=""), row.names=F, quote=F, sep="\t")
 write.table(pdeep2_prediction_unique_data, paste(pdeep2_prediction, "_unique.txt", sep=""), row.names=F, quote=F, sep="\t")
