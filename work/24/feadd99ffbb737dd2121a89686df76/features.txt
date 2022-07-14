@@ -1,1 +1,0 @@
-Title	Modification	modification	Mod_Sequence	Label	RT	Mass	Mass_Error	Abs_Mass_Error	Ln_Total_Intensity	Match_Ions_Intensity	Rel_Match_Ions_Intensity	Max_Match_Ion_Intensity	Charge	Peptide	Proteins
