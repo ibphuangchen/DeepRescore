@@ -172,7 +172,7 @@ if (software == "maxquant"){
                 -r $mzid_file \
                 -rt $result_type \
                 -s $spectrum_file \
-                -st 1 \
+                -st 2 \
                 -i * \
                 -k s \
                 -o ./ \
@@ -244,7 +244,7 @@ process pga_fdr_control {
     """
     mkdir peptide_level psm_level
     Rscript ${baseDir}/bin/got_pga_input.R $feature_file $software ./${sample}-rawPSMs.txt
-    Rscript ${baseDir}/bin/calculate_fdr.R ./ $sample ${baseDir}/bin/protein.pro-ref.fasta
+    Rscript ${baseDir}/bin/calculate_fdr.R ./ $sample ${baseDir}/bin/protein.pro-ref.fasta ${decoy_prefix}
     """
 }
 
@@ -367,11 +367,11 @@ process train_autoRT {
     mkdir -p ./autoRT_models
     for file in ${autoRT_train_folder}/*.txt
     do
-        fraction=`basename \${file} .txt`
-        mkdir -p ./autoRT_models/\${fraction}
+        fraction=`basename "\${file}" .txt`
+        mkdir -p ./autoRT_models/"\${fraction}"
         python /opt/AutoRT/autort.py train \
-        -i \$file \
-        -o ./autoRT_models/\${fraction} \
+        -i "\$file" \
+        -o ./autoRT_models/"\${fraction}" \
         -e 40 \
         -b 64 \
         -u m \
