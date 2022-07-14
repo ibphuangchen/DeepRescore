@@ -6,4 +6,14 @@ ms_energy:
   0.3
 ms_instrument:
   Lumos
+pga:
+  /home/p_eclipse_combio/workspace/platform/containers/pga_latest.sif
+pdeep2:
+  /home/p_eclipse_combio/workspace/platform/containers/pdeep2_latest.sif
+neoflow:
+  /home/p_eclipse_combio/workspace/platform/containers/neoflow_1.0.sif
+autort:
+  /home/p_eclipse_combio/workspace/platform/containers/autort_latest.sif
+percolator:
+  /home/p_eclipse_combio/workspace/platform/containers/percolator_3.4.sif
 
