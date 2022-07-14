@@ -37,4 +37,5 @@ output_format <- output_format %>% select(-Proteins, Proteins)
 output_format$Label <- ifelse(output_format$Proteins == "", -1, output_format$Label)
 output_format$Proteins <- ifelse(output_format$Proteins == "", "XXX_Decoy", output_format$Proteins)
 
+output_format=output_format[!grepl(output_format$Peptide, pattern = 'U|X'),]
 write.table(output_format, output, row.names=F, quote=F, sep="\t")

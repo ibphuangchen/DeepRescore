@@ -2,4 +2,8 @@ deepRescorePath:
   /home/chuang8/DeepRescore
 searchBy:
   comet
+ms_energy:
+  0.3
+ms_instrument:
+  Lumos
 

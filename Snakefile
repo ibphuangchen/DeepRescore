@@ -19,7 +19,7 @@ rule calc_basic_features:
 				-o features/{wildcards.sample} \
 				-a 0.05 \
 				-c 0 \
-				-decoy ${decoy_prefix} \
+				-decoy {config["decoy"]} \
 				-ft pdf \
 				--features
 		"""
@@ -36,7 +36,7 @@ rule pga_fdr_control:
 	shell:
 		"""
 		Rscript {config["deepRescorePath"]}/bin/got_pga_input.R {input} {config['searchBy']} {output.rawPSM}
-    Rscript {config["deepRescorePath"]}/bin/calculate_fdr.R {output.rawPSM} pga/{wildcards.sample} {config["deepRescorePath"]}/bin/protein.pro-ref.fasta rev_
+    Rscript {config["deepRescorePath"]}/bin/calculate_fdr.R {output.rawPSM} pga/{wildcards.sample} {config["deepRescorePath"]}/bin/protein.pro-ref.fasta {config["decoy"]}
 		"""
 
 rule generate_train_prediction_data:
@@ -100,7 +100,7 @@ rule run_pdeep2:
 		"pdeep2_prediction/{sample}_pdeep2_pd_results.txt"
 	shell:
     """
-    python /opt/pDeep2/predict.py -e $energy -i $instrument \
+    python /opt/pDeep2/predict.py -e {config["ms_energy"]} -i {config["ms_instrument"]} \
 				-in {input} \
 				-out {output} 
     """

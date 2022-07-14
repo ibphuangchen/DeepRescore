@@ -1,0 +1,2 @@
+#!/bin/bash -ue
+java -Xmx8g -jar /Users/chuang8/proteomics/DeepRescore/bin/PDV-1.6.1.beta.features/PDV-1.6.1.beta.features-jar-with-dependencies.jar                 -r A1101.pep.xml                 -rt 2                 -s A1101.mgf                 -st 1                 -i *                 -k s                 -o ./                 -a 0.05                 -c 0                 -decoy XXX_                 -ft pdf                 --features
