@@ -1,11 +1,16 @@
+---
 deepRescorePath:
   /home/chuang8/DeepRescore
 searchBy:
   comet
+decoy:
+  rev_
 ms_energy:
   0.3
 ms_instrument:
   Lumos
+resultType:
+  2
 pga:
   /home/p_eclipse_combio/workspace/platform/containers/pga_latest.sif
 pdeep2:

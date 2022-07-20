@@ -16,37 +16,34 @@ psm_pga_results <- psm_pga_results %>% filter(peptide %in% pep_pga_results$pepti
 auto_rt_train_data <- left_join(psm_pga_results, all_features, by="Title") %>% select(Mod_Sequence, RT, Title, evalue)
 auto_rt_prediction_data <- left_join(raw_psm, all_features, by="Title") %>% select(Mod_Sequence, RT, Title)
 
-if(!grepl(auto_rt_train_data$Title,pattern = '\\.')) #single fraction? by Chen@eclipse
-{
-  auto_rt_train_data=as.data.table(auto_rt_train_data)
+#single fraction? by Chen@eclipse
+if(!grepl(auto_rt_train_data$Title[1], pattern = '\\.')) {
+	auto_rt_train_data=as.data.table(auto_rt_train_data)
   auto_rt_train_data=auto_rt_train_data[order(Mod_Sequence,-evalue), .(Mod_Sequence, RT, evalue)]
   auto_rt_train_data=auto_rt_train_data[!duplicated(Mod_Sequence) & !grepl(Mod_Sequence,pattern = 'U|X')]
   colnames(auto_rt_train_data) <- c("x", "y", "evalue")
-  fwrite(auto_rt_train_data, auto_rt_train_out, sep="\t")
+  fwrite(auto_rt_train_data, auto_rt_train_out, sep="\t", quote=F)
   
 	auto_rt_prediction_data = as.data.table(auto_rt_prediction_data)
   auto_rt_prediction_data=auto_rt_prediction_data[, .(Mod_Sequence, RT, Title)]
   auto_rt_prediction_data = auto_rt_prediction_data[!grepl(Mod_Sequence,pattern = 'U|X')]
   colnames(auto_rt_prediction_data) <- c("x", "y", "index")
-  fwrite(auto_rt_prediction_data, auto_rt_prediction_out, sep="\t")
-}
-	else{ #below are the original by Kai
-  
-  
-	auto_rt_train_data <- separate(auto_rt_train_data, Title, into=c("fraction", NA, NA, NA), sep="\\.", remove=F)
+  fwrite(auto_rt_prediction_data, auto_rt_prediction_out, sep="\t", quote=F)
+} else{ #below are the original by Kai
+  auto_rt_train_data <- separate(auto_rt_train_data, Title, into=c("fraction", NA, NA, NA), sep="\\.", remove=F)
 	auto_rt_train_data_split <- split(auto_rt_train_data, auto_rt_train_data$fraction)
 
 	auto_rt_prediction_data <- separate(auto_rt_prediction_data, Title, into=c("fraction", NA, NA, NA), sep="\\.", remove=F)
 	auto_rt_prediction_data_split <- split(auto_rt_prediction_data, auto_rt_prediction_data$fraction)
 
 	lapply(names(auto_rt_train_data_split), function(x){
-		one_data <- auto_rt_train_data_split[[x]]
-		one_data <- one_data[order(one_data$Mod_Sequence, -(one_data$evalue)), ]
-		one_data <- one_data[!duplicated(one_data$Mod_Sequence), ]
-		one_data <- one_data %>% select(Mod_Sequence, RT, evalue)
-		colnames(one_data) <- c("x", "y", "evalue")
-		write.table(one_data, paste(auto_rt_train_folder, x, ".txt", sep=""), row.names=F, quote=F, sep="\t")
-	})
+				 one_data <- auto_rt_train_data_split[[x]]
+				 one_data <- one_data[order(one_data$Mod_Sequence, -(one_data$evalue)), ]
+				 one_data <- one_data[!duplicated(one_data$Mod_Sequence), ]
+				 one_data <- one_data %>% select(Mod_Sequence, RT, evalue)
+				 colnames(one_data) <- c("x", "y", "evalue")
+				 write.table(one_data, paste(auto_rt_train_folder, x, ".txt", sep=""), row.names=F, quote=F, sep="\t")
+				})
 
 	lapply(names(auto_rt_prediction_data_split), function(x){
         one_data <- auto_rt_prediction_data_split[[x]]
@@ -59,5 +56,9 @@ if(!grepl(auto_rt_train_data$Title,pattern = '\\.')) #single fraction? by Chen@e
 pdeep2_prediction_data <- raw_psm %>% select(peptide, mods, charge)
 colnames(pdeep2_prediction_data) <- c("peptide", "modification", "charge")
 pdeep2_prediction_unique_data <- pdeep2_prediction_data %>% distinct()
-fwrite(pdeep2_prediction_data, paste(pdeep2_prediction, ".tsv", sep=""), sep="\t")
-fwrite(pdeep2_prediction_unique_data, paste(pdeep2_prediction, "_unique.tsv", sep=""), row.names=F, quote=F, sep="\t")
+fwrite(pdeep2_prediction_data, 
+			 paste(pdeep2_prediction, "_pd.tsv", sep=""), 
+			 sep="\t", quote=F)
+fwrite(pdeep2_prediction_unique_data, 
+			 paste(pdeep2_prediction, "_pd_unique.tsv", sep=""), 
+			 sep="\t", quote=F)

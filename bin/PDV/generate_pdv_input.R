@@ -2,14 +2,15 @@ library(tidyverse)
 library(data.table)
 
 args <- commandArgs(T)
-result_folder <- args[1]
-sample <- args[2]
-features_data <- fread(args[3])
-percolator_input <- fread(args[4]) %>% select(error, similarity, Title)
+percolator_folder = args[1]
+result_folder <- args[2]
+sample <- args[3]
+features_data <- fread(args[4])
+percolator_input <- fread(args[5]) %>% select(error, similarity, Title)
 colnames(percolator_input) <- c("Delta_RT", "SA", "Title")
 features_data <- left_join(features_data, percolator_input, by="Title")
 
-pep_result <- fread(paste(result_folder, sample, "_pep.txt", sep="")) %>%
+pep_result <- fread(paste(percolator_folder,"/",sample, "_pep.tsv", sep="")) %>%
 	select(PSMId, score, `q-value`)
 colnames(pep_result) <- c("Title", "Percolator_score", "q_value")
 
@@ -23,10 +24,10 @@ pdv_input$modification <- ifelse(pdv_input$modification == "", "-",pdv_input$mod
 
 pdv_input_fdr_1 <- pdv_input %>% filter(q_value <= 0.01)
 
-write.table(pdv_input, paste(result_folder, sample, "_pep_final.tsv", sep=""), row.names=F, quote=F, sep="\t")
-write.table(pdv_input_fdr_1, paste(result_folder, sample, "_pep_final_qvalue0.01.tsv", sep=""), row.names=F, quote=F, sep="\t")
+write.table(pdv_input, paste(result_folder,"/",sample, "_pep_final.tsv", sep=""), row.names=F, quote=F, sep="\t")
+write.table(pdv_input_fdr_1, paste(result_folder,"/",sample, "_pep_final_qvalue0.01.tsv", sep=""), row.names=F, quote=F, sep="\t")
 
-psm_result <- fread(paste(result_folder, sample, "_psms.txt", sep="")) %>%
+psm_result <- fread(paste(percolator_folder ,"/", sample, "_psms.tsv", sep="")) %>%
         select(PSMId, score, `q-value`)
 colnames(psm_result) <- c("Title", "Percolator_score", "q_value")
 
@@ -40,5 +41,5 @@ pdv_input$modification <- ifelse(pdv_input$modification == "", "-",pdv_input$mod
 
 pdv_input_fdr_1 <- pdv_input %>% filter(q_value <= 0.01)
 
-write.table(pdv_input, paste(result_folder, sample, "_psm_final.tsv", sep=""), row.names=F, quote=F, sep="\t")
-write.table(pdv_input_fdr_1, paste(result_folder, sample, "_psm_final_qvalue0.01.tsv", sep=""), row.names=F, quote=F, sep="\t")
+write.table(pdv_input, paste(result_folder, "/", sample, "_psm_final.tsv", sep=""), row.names=F, quote=F, sep="\t")
+write.table(pdv_input_fdr_1, paste(result_folder, "/", sample, "_psm_final_qvalue0.01.tsv", sep=""), row.names=F, quote=F, sep="\t")
